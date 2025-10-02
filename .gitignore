@@ -1,0 +1,32 @@
+# Build output
+**/bin/
+**/obj/
+artifacts/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings
+
+# Logs
+*.log
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# ASP.NET / EF
+*.db
+*.db-shm
+*.db-wal
+Migrations/
+
+# Secrets
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
