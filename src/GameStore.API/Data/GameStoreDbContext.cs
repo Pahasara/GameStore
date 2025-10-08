@@ -23,7 +23,6 @@ public class GameStoreDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         // Apply configurations from the assembly
-
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(GameStoreDbContext).Assembly);
 
         // Add seed data

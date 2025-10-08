@@ -1,0 +1,50 @@
+namespace GameStore.Common;
+
+public class Result<T>
+{
+    public bool IsSuccess { get; }
+    public T? Value { get; }
+    public string Error { get; }
+    public bool IsFailure => !IsSuccess;
+
+    private Result(bool isSuccess, T? value, string error)
+    {
+        IsSuccess = isSuccess;
+        Value = value;
+        Error = error;
+    }
+
+    public static Result<T> Success(T value) => new(true, value, string.Empty);
+    public static Result<T> Failure(string error) => new(false, default, error);
+
+    // Allows: Result<Game> result = game; instead of Result<Game>.Success(game);
+    public static implicit operator Result<T>(T value) => Success(value);
+
+    public static Result<T> SuccessIf(bool condition, T value, string error) =>
+        condition ? Success(value) : Failure(error);
+    public static Result<T> FailureIf(bool condition, T value, string error) =>
+        condition ? Failure(error) : Success(value);
+}
+
+public class Result
+{
+    public bool IsSuccess { get; }
+    public string Error { get; }
+    public bool IsFailure => !IsSuccess;
+
+    private Result(bool isSuccess, string error)
+    {
+        IsSuccess = isSuccess;
+        Error = error;
+    }
+
+    public static Result Success() => new(true, string.Empty);
+    public static Result Failure(string error) => new(false, error);
+
+    public static Result SuccessIf(bool condition, string error) =>
+        condition ? Success() : Failure(error);
+    public static Result FailureIf(bool condition, string error) =>
+        condition ? Failure(error) : Success();
+
+    public static implicit operator Result(bool isSuccess) => isSuccess ? Success() : Failure("Operation failed");
+}
