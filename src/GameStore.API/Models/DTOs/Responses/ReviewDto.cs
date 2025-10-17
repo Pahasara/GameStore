@@ -25,8 +25,8 @@ public class ReviewDto
             { TotalDays: >= 365 } => $"{(int)(timeSpan.TotalDays / 365)} year(s) ago.",
             { TotalDays: >= 30 } => $"{(int)(timeSpan.TotalDays / 30)} month(s) ago.",
             { TotalDays: >= 1 } => $"{(int)(timeSpan.TotalDays)} day(s) ago.",
-            { TotalHours: >= 1 } => $"{(int)(timeSpan.TotalDays)} hour(s) ago.",
-            { TotalMinutes: >= 1 } => $"{(int)(timeSpan.TotalDays)} minute(s) ago.",
+            { TotalHours: >= 1 } => $"{(int)(timeSpan.TotalHours)} hour(s) ago.",
+            { TotalMinutes: >= 1 } => $"{(int)(timeSpan.TotalMinutes)} minute(s) ago.",
             _ => "Just Now"
         };
     }

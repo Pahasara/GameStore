@@ -80,13 +80,17 @@ public class GameStoreDbContext : DbContext
     {
         var now = DateTime.UtcNow;
 
-        var entries = ChangeTracker.Entries()
-            .Where(e => e.State is EntityState.Modified)
-            .Where(e => e.Properties.Any(p => p.Metadata.Name == "UpdatedAt"));
-
-        foreach (var entry in entries)
+        foreach (var entry in ChangeTracker.Entries())
         {
-            entry.Property("UpdatedAt").CurrentValue = now;
+            if (entry.State == EntityState.Added && entry.Properties.Any(p => p.Metadata.Name == "CreatedAt"))
+            {
+                entry.Property("CreatedAt").CurrentValue = now;
+            }
+
+            if (entry.State == EntityState.Modified && entry.Properties.Any(p => p.Metadata.Name == "UpdatedAt"))
+            {
+                entry.Property("UpdatedAt").CurrentValue = now;
+            }
         }
     }
 }

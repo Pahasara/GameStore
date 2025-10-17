@@ -9,9 +9,15 @@ public class Result<T>
 
     private Result(bool isSuccess, T? value, string error)
     {
+        if (isSuccess && string.IsNullOrWhiteSpace(error) == false)
+            throw new ArgumentException("Success result cannot have an error", nameof(error));
+
+        if (!isSuccess && string.IsNullOrWhiteSpace(error))
+            throw new ArgumentException("Failure result must have an error", nameof(error));
+
         IsSuccess = isSuccess;
         Value = value;
-        Error = error;
+        Error = error ?? string.Empty;
     }
 
     public static Result<T> Success(T value) => new(true, value, string.Empty);
@@ -34,6 +40,9 @@ public class Result
 
     private Result(bool isSuccess, string error)
     {
+        if (!isSuccess && string.IsNullOrWhiteSpace(error))
+            throw new ArgumentException("Failure result must have an error", nameof(error));
+
         IsSuccess = isSuccess;
         Error = error;
     }
@@ -45,6 +54,4 @@ public class Result
         condition ? Success() : Failure(error);
     public static Result FailureIf(bool condition, string error) =>
         condition ? Failure(error) : Success();
-
-    public static implicit operator Result(bool isSuccess) => isSuccess ? Success() : Failure("Operation failed");
 }

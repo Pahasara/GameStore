@@ -14,6 +14,7 @@ public class GameSummaryDto
     public string GenreName { get; set; } = string.Empty;
     public int PlatformId { get; set; }
     public string PlatformName { get; set; } = string.Empty;
+    public double AverageRating { get; set; }
 
     // Computed properties
     public string FormattedPrice => Price.ToString("C");

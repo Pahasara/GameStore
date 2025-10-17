@@ -2,7 +2,7 @@ using GameStore.Models.Entities;
 
 namespace GameStore.Repositories;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork : IAsyncDisposable
 {
     // Specialized repositories
     IGameRepository Games { get; }

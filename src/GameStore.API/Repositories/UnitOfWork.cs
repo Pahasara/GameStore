@@ -55,6 +55,9 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
+        if (_transaction is not null)
+            throw new InvalidOperationException("Transaction already started.");
+
         // EF Core transaction wraps database transaction
         _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
     }
@@ -85,12 +88,13 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        // clean up transaction if still active
-        _transaction?.Dispose();
-
-        // Tell garbage collector not to call finalizer
-        GC.SuppressFinalize(this);
+        if (_transaction is not null)
+        {
+            // clean up transaction if still active
+            await _transaction.DisposeAsync();
+            _transaction = null;
+        }
     }
 }
