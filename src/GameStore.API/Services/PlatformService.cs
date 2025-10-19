@@ -1,7 +1,7 @@
 using GameStore.Common;
+using GameStore.DTOs.Responses;
+using GameStore.Entities;
 using GameStore.Extensions;
-using GameStore.Models.DTOs.Responses;
-using GameStore.Models.Entities;
 using GameStore.Repositories;
 
 namespace GameStore.Services;

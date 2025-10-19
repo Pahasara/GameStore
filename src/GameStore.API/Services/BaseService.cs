@@ -25,7 +25,7 @@ public abstract class BaseService<TEntity, TDto>
         if (id <= 0)
         {
             Logger.LogWarning("Invalid {EntityName} ID: {Id}", EntityName, id);
-            return Result<TDto>.Failure($"Invalid {typeof(TEntity).Name} ID");
+            return Result<TDto>.Failure($"Invalid {typeof(TEntity).Name} ID", ErrorType.Validation);
         }
 
         try
@@ -35,15 +35,15 @@ public abstract class BaseService<TEntity, TDto>
             if (entity is null)
             {
                 Logger.LogWarning("Error getting {EntityName} with ID: {Id}", EntityName, id);
-                return Result<TDto>.Failure($"{EntityName} not found");
+                return Result<TDto>.Failure($"{EntityName} not found", ErrorType.NotFound);
             }
 
             return Result<TDto>.Success(MapToDto(entity));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error getting {EntityType} with ID {id}", EntityName, id);
-            return Result<TDto>.Failure($"Failed to retrieve {EntityName}");
+            Logger.LogError(ex, "Error getting {EntityType} with ID: {id}", EntityName, id);
+            return Result<TDto>.Failure($"Failed to retrieve {EntityName}", ErrorType.BadRequest);
         }
     }
 
@@ -76,6 +76,6 @@ public abstract class BaseService<TEntity, TDto>
         CancellationToken cancellationToken)
     {
         var exists = await existsCheck(id, cancellationToken);
-        return exists ? Result.Success() : Result.Failure($"Invalid {entityName}");
+        return exists ? Result.Success() : Result.Failure($"Invalid {entityName}", ErrorType.NotFound);
     }
 }

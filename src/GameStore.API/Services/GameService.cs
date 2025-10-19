@@ -1,8 +1,8 @@
 using GameStore.Common;
-using GameStore.Models.DTOs.Requests;
-using GameStore.Models.DTOs.Responses;
-using GameStore.Repositories;
+using GameStore.DTOs.Requests;
+using GameStore.DTOs.Responses;
 using GameStore.Extensions;
+using GameStore.Repositories;
 
 namespace GameStore.Services;
 
@@ -33,13 +33,13 @@ public class GameService : IGameService
         {
             // Input validation
             if (pageNumber < 1)
-                return Result<PagedResponse<GameSummaryDto>>.Failure("Page number must be at least 1");
+                return Result<PagedResponse<GameSummaryDto>>.Failure("Page number must be at least 1", ErrorType.Validation);
 
             if (pageSize < 1 || pageSize > 100)
-                return Result<PagedResponse<GameSummaryDto>>.Failure("Page size must be between 1 and 100");
+                return Result<PagedResponse<GameSummaryDto>>.Failure("Page size must be between 1 and 100", ErrorType.Validation);
 
             if (minPrice.HasValue && maxPrice.HasValue && minPrice > maxPrice)
-                return Result<PagedResponse<GameSummaryDto>>.Failure("Minimum price cannot exceed maximum price");
+                return Result<PagedResponse<GameSummaryDto>>.Failure("Minimum price cannot exceed maximum price", ErrorType.Validation);
 
             // Get data from repository
             var (games, totalCount) = await _unitOfWork.Games.SearchGamesAsync(searchTerm, genreId, platformId, minPrice, maxPrice, pageNumber, pageSize, cancellationToken);
@@ -62,14 +62,14 @@ public class GameService : IGameService
     public async Task<Result<GameDto>> GetGameByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         if (id <= 0)
-            return Result<GameDto>.Failure("Invalid game ID");
+            return Result<GameDto>.Failure("Invalid game ID", ErrorType.Validation);
 
         try
         {
             var game = await _unitOfWork.Games.GetGameWithDetailsAsync(id, cancellationToken);
 
             if (game is null)
-                return Result<GameDto>.Failure("Game not found");
+                return Result<GameDto>.Failure("Game not found", ErrorType.NotFound);
 
             return Result<GameDto>.Success(game.ToDto());
         }
@@ -107,7 +107,7 @@ public class GameService : IGameService
         {
             var validation = await ValidateGameCreationAsync(request, cancellationToken);
             if (validation.IsFailure)
-                return Result<GameDto>.Failure(validation.Error);
+                return Result<GameDto>.Failure(validation.Error,  ErrorType.Validation);
 
             var game = request.ToEntity();
 
@@ -130,17 +130,17 @@ public class GameService : IGameService
     public async Task<Result<GameDto>> UpdateGameAsync(int id, UpdateGameRequest request, CancellationToken cancellationToken = default)
     {
         if (id <= 0)
-            return Result<GameDto>.Failure("Invalid game ID");
+            return Result<GameDto>.Failure("Invalid game ID", ErrorType.Validation);
 
         try
         {
             var game = await _unitOfWork.Games.GetByIdAsync(id, cancellationToken);
             if (game is null)
-                return Result<GameDto>.Failure("Game not found");
+                return Result<GameDto>.Failure("Game not found", ErrorType.NotFound);
 
             var validation = await ValidateGameUpdateAsync(id, request, cancellationToken);
             if (validation.IsFailure)
-                return Result<GameDto>.Failure(validation.Error);
+                return Result<GameDto>.Failure(validation.Error, ErrorType.Validation);
 
             game.UpdateFromDto(request);
 
@@ -163,17 +163,17 @@ public class GameService : IGameService
     public async Task<Result> DeleteGameAsync(int id, CancellationToken cancellationToken = default)
     {
         if (id <= 0)
-            return Result.Failure("Invalid game ID");
+            return Result.Failure("Invalid game ID", ErrorType.Validation);
 
         try
         {
             var game = await _unitOfWork.Games.GetByIdAsync(id, cancellationToken);
             if (game is null)
-                return Result.Failure("Game not found");
+                return Result.Failure("Game not found", ErrorType.NotFound);
 
             var hasOrders = await _unitOfWork.OrderItems.ExistsAsync(oi => oi.GameId == id, cancellationToken);
             if (hasOrders)
-                return Result.Failure("Cannot delete game with existing orders");
+                return Result.Failure("Cannot delete game with existing orders", ErrorType.Conflict);
 
             // Soft delete
             game.IsActive = false;
@@ -199,15 +199,15 @@ public class GameService : IGameService
     {
         var titleExists = await _unitOfWork.Games.ExistsAsync(g => g.Title == request.Title, cancellationToken);
         if (titleExists)
-            return Result.Failure("Game with this title already exists");
+            return Result.Failure("Game with this title already exists", ErrorType.Conflict);
 
         var genreExists = await _unitOfWork.Genres.ExistsAsync(g => g.Id == request.GenreId, cancellationToken);
         if (!genreExists)
-            return Result.Failure("Invalid genre");
+            return Result.Failure("Invalid genre", ErrorType.NotFound);
 
         var platformExists = await _unitOfWork.Platforms.ExistsAsync(p => p.Id == request.PlatformId, cancellationToken);
         if (!platformExists)
-            return Result.Failure("Invalid platform");
+            return Result.Failure("Invalid platform", ErrorType.NotFound);
 
         return Result.Success();
     }
@@ -216,15 +216,15 @@ public class GameService : IGameService
     {
         var titleExists = await _unitOfWork.Games.ExistsAsync(g => g.Title == request.Title && g.Id != gameId, cancellationToken);
         if (titleExists)
-            return Result.Failure("Game with this title already exists");
+            return Result.Failure("Game with this title already exists", ErrorType.Conflict);
 
         var genreExists = await _unitOfWork.Genres.ExistsAsync(g => g.Id == request.GenreId, cancellationToken);
         if (!genreExists)
-            return Result.Failure("Invalid genre");
+            return Result.Failure("Invalid genre", ErrorType.NotFound);
 
         var platformExists = await _unitOfWork.Platforms.ExistsAsync(p => p.Id == request.PlatformId, cancellationToken);
         if (!platformExists)
-            return Result.Failure("Invalid platform");
+            return Result.Failure("Invalid platform", ErrorType.NotFound);
 
         return Result.Success();
     }

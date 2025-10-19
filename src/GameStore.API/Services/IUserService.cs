@@ -1,5 +1,5 @@
 using GameStore.Common;
-using GameStore.Models.DTOs.Responses;
+using GameStore.DTOs.Responses;
 
 namespace GameStore.Services;
 

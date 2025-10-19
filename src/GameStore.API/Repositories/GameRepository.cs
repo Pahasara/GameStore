@@ -1,5 +1,5 @@
+using GameStore.Entities;
 using GameStore.Data;
-using GameStore.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Repositories;

@@ -1,4 +1,4 @@
-using GameStore.Models.Entities;
+using GameStore.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

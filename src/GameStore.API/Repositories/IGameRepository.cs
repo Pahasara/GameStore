@@ -1,4 +1,4 @@
-using GameStore.Models.Entities;
+using GameStore.Entities;
 
 namespace GameStore.Repositories;
 

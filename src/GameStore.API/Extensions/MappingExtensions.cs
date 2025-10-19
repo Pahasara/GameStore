@@ -1,6 +1,6 @@
-using GameStore.Models.DTOs.Requests;
-using GameStore.Models.DTOs.Responses;
-using GameStore.Models.Entities;
+using GameStore.Entities;
+using GameStore.DTOs.Requests;
+using GameStore.DTOs.Responses;
 
 namespace GameStore.Extensions;
 
