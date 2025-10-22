@@ -1,4 +1,5 @@
 using GameStore.Common;
+using GameStore.DTOs.Requests;
 using GameStore.DTOs.Responses;
 using GameStore.Entities;
 using GameStore.Extensions;
